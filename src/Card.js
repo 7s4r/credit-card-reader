@@ -57,7 +57,8 @@ class Card extends EventEmitter
 
       const protocol = this.protocol
 
-      this.emit('command-issued', {card: this, command: apduCommand})
+      this.emit('command-emitted', {card: this, command: apduCommand})
+      console.info('Command emitted')
 
       if (callback) {
         this.device.transmit(buffer, 0x102, protocol, (err, response) => {
@@ -66,6 +67,7 @@ class Card extends EventEmitter
             command: apduCommand,
             response: new ApduResponse(response),
           })
+          console.info('Response received: ', new ApduResponse(response))
           callback(err, response)
         })
       } else {
@@ -79,6 +81,7 @@ class Card extends EventEmitter
                 command: apduCommand,
                 response: new ApduResponse(response),
               })
+              console.info('Response received: ', new ApduResponse(response))
               resolve(response)
             }
           })
@@ -121,7 +124,10 @@ class Card extends EventEmitter
 
       return this.parseCardResponse(apduCommand).then(response => {
         if (response.isOk()) {
-          this.emit('application-selected', {application: Buffer.from(bytes).toString('hex')})
+          const application = Buffer.from(bytes).toString('hex')
+          
+          this.emit('application-selected', { application })
+          console.info('Application selected: ', application)
         }
 
         return response

@@ -137,6 +137,14 @@ class Device extends EventEmitter
       return `Device(name:'${this.getName()}')`
     }
 
+    async execute(command, data = null) {
+      if (this.card && command) {
+        return this.card[command](data)
+      }
+
+      return false
+    }
+
     close() {
       this.reader.close()
       this.pcsc.close()
