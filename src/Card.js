@@ -110,7 +110,7 @@ class Card extends EventEmitter
         }
 
         return response
-      })
+      }).catch((error) => console.error('[COMMAND ERROR]: ', error))
     }
 
     selectFile(bytes, p1, p2) {
