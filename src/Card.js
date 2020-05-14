@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
-import ApduResponse from './ApduResponse'
-import ApduCommand from './ApduCommand'
-import hexUtil from './utils/hexUtil'
+import ApduResponse from './ApduResponse.js'
+import ApduCommand from './ApduCommand.js'
+import hexUtil from './utils/hexUtil.js'
 
 const ins = {
   APPEND_RECORD: 0xE2,

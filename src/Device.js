@@ -1,69 +1,75 @@
 import EventEmitter from 'events'
 import pcsclite from 'pcsclite'
-import Card from './Card'
+import Card from './Card.js'
 
 class Device extends EventEmitter
 {
     constructor(options) {
-        super()
-        this._pcsc = pcsclite()
-        this._card = null
-        this._status = null
-        options = options || {}
+      super()
+      this.pcsc = pcsclite()
+      this.card = null
+      this.status = null
+      options = options || {}
 
-        this._pcsc.on('error', error => {
-          this.emit('error', { error })
-          console.error('PCSC error', error.message)
-        }).on('reader', reader => {
-          this._reader = reader
-          this._name = reader.name
-          this._shareMode = options.shareMode || reader.SCARD_SHARE_SHARED,
-          this._disposition = options.disposition || reader.SCARD_LEAVE_CARD,
-          this.emit('device-activated')
-          console.info('New reader detected', reader.name)
-        })
+      this.pcsc.on('reader', (reader) => {
+        this.reader = reader
+        this.name = reader.name
+        this.shareMode = options.shareMode || reader.SCARD_SHARE_SHARED
+        this.disposition = options.disposition || reader.SCARD_LEAVEcard
+        const autoConnect = options.autoConnect || true
+        const autoDisconnect = options.autoDisconnect || true
+        const isCardInserted = options.isCardInserted || this.defaultIsCardInserted
+        const isCardRemoved = options.isCardRemoved || this.defaultIsCardRemoved
 
-        const
-          autoConnect = options.autoConnect || true,
-          autoDisconnect = options.autoDisconnect || true,
-          isCardInserted = options.isCardInserted || this.defaultIsCardInserted,
-          isCardRemoved = options.isCardRemoved || this.defaultIsCardRemoved
+        this.emit('reader-detected')
+        console.info('Reader detected', reader.name)
 
-        this._reader.on('status', status => {
-            this._status = status
+        this.reader.on('status', status => {
+          this.status = status
+          const changes = this.reader.state ^ status.state
 
-            const changes = this._reader.state ^ status.state
+          if (changes) {
+            this.emit('status', status)
+            console.info('Status: ', status)
 
-            if (changes) {
-                this.emit('status', status)
-                console.info('Status: ', status)
+            if (isCardRemoved(changes, this.reader, status)) {
+              this.emit('card-left', status)
+              console.info('Card left')
 
-                if (isCardRemoved(changes, this._reader, status)) {
-                    this.emit('card-left', status)
-                    console.info('Card left')
+              autoDisconnect && this.cardRemoved()
+            } else if (isCardInserted(changes, this.reader, status)) {
+              this.emit('card-detected', status)
+              console.info('Card detected')
 
-                    autoDisconnect && this.cardRemoved()
-                } else if (isCardInserted(changes, this._reader, status)) {
-                    this.emit('card-detected', status)
-                    console.info('Card detected')
-
-                    autoConnect && this.cardInserted()
-                }
+              autoConnect && this.cardInserted()
             }
+          }
         })
+
+        this.reader.on('error', (error) => {
+          console.error('[READER ERROR]: ', error.message)
+        })
+
+        this.reader.on('end', () => {
+          console.info('Reader removed')
+        })
+      })
+      
+      this.pcsc.on('error', error => {
+        this.emit('error', { error })
+        console.error('[PCSC ERROR]: ', error.message)
+      })
     }
 
     cardInserted() {
-      this.connect({ share_mode: this._shareMode }).then(event => {
+      this.connect({ share_mode: this.shareMode }).then(event => {
         this.emit('card-inserted', event)
         console.info('Card inserted')
       }).catch(this.emit.bind(this, 'error'))
     }
 
     cardRemoved() {
-      // const card = this.getCard()
-
-      this.disconnect(this._disposition).then(event => {
+      this.disconnect(this.disposition).then(event => {
         this.emit('card-removed', event)
         console.info('Card removed')
       }).catch(this.emit.bind(this, 'error'))
@@ -78,7 +84,7 @@ class Device extends EventEmitter
     }
 
     transmit(data, resLen, protocol) {
-      return new Promise((ok, nok) => this._reader.transmit(data, resLen, protocol, (e, r) => e ? nok(e) : ok(r)))
+      return new Promise((ok, nok) => this.reader.transmit(data, resLen, protocol, (e, r) => e ? nok(e) : ok(r)))
     }
 
     connect(options = {}) {
@@ -91,7 +97,7 @@ class Device extends EventEmitter
           ok({device: this, protocol, card: this.getCard()})
         }
 
-        this._reader.connect(options, callback)
+        this.reader.connect(options, callback)
       })
     }
 
@@ -107,24 +113,24 @@ class Device extends EventEmitter
               ok({name: this.name, card})
           }
 
-        this._reader.disconnect(disposition, callback)
+        this.reader.disconnect(disposition, callback)
       })
     }
 
     getStatus() {
-      return this._status
+      return this.status
     }
 
     setCard(card) {
-      this._card = card instanceof Card ? card : null
+      this.card = card instanceof Card ? card : null
     }
 
     getCard() {
-      return this._card
+      return this.card
     }
 
     getName() {
-      return this._name
+      return this.name
     }
 
     toString() {
@@ -132,7 +138,8 @@ class Device extends EventEmitter
     }
 
     close() {
-      this._reader.close()
+      this.reader.close()
+      this.pcsc.close()
     }
 }
 

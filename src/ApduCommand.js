@@ -1,4 +1,4 @@
-import hexUtil from './utils/hexUtil'
+import hexUtil from './utils/hexUtil.js'
 
 /*
 CASE    COMMAND     RESPONSE
