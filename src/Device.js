@@ -22,7 +22,7 @@ class Device extends EventEmitter
         const isCardRemoved = options.isCardRemoved || this.defaultIsCardRemoved
 
         this.emit('reader-detected')
-        console.info('Reader detected', reader.name)
+        console.info('Reader detected: ', reader.name)
 
         this.reader.on('status', status => {
           this.status = status
@@ -62,9 +62,9 @@ class Device extends EventEmitter
     }
 
     cardInserted() {
-      this.connect({ share_mode: this.shareMode }).then(event => {
+      this.connect({ share_mode: this.shareMode }).then((event) => {
         this.emit('card-connected', event)
-        console.info('Card connected')
+        console.info('Card connected: ', event)
       }).catch(this.emit.bind(this, 'error'))
     }
 
