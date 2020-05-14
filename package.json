@@ -1,0 +1,41 @@
+{
+  "name": "smartcard",
+  "version": "0.0.1",
+  "description": "Easy reading and writing on smartcards over PC/SC with Node.js",
+  "author": "Gueorgui AGAPOV",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/7s4r/smartcard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/7s4r/smartcard/issues"
+  },
+  "homepage": "https://github.com/7s4r/smartcard#readme",
+  "keywords": [
+    "smartcard",
+    "PC/SC",
+    "pcsc",
+    "EMV",
+    "APDU",
+    "AID",
+    "ATR"
+  ],
+  "type": "module",
+  "engines": {
+      "node": ">=8.10.0"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "pcsclite": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.0.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0"
+  }
+}
