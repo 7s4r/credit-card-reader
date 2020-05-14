@@ -33,13 +33,13 @@ class Device extends EventEmitter
             console.info('Status: ', status)
 
             if (isCardRemoved(changes, this.reader, status)) {
-              this.emit('card-left', status)
-              console.info('Card left')
+              this.emit('card-removed', status)
+              console.info('Card removed')
 
               autoDisconnect && this.cardRemoved()
             } else if (isCardInserted(changes, this.reader, status)) {
-              this.emit('card-detected', status)
-              console.info('Card detected')
+              this.emit('card-inserted', status)
+              console.info('Card inserted')
 
               autoConnect && this.cardInserted()
             }
@@ -51,7 +51,7 @@ class Device extends EventEmitter
         })
 
         this.reader.on('end', () => {
-          console.info('Reader removed')
+          console.info('Reader ended')
         })
       })
       
@@ -63,8 +63,8 @@ class Device extends EventEmitter
 
     cardInserted() {
       this.connect({ share_mode: this.shareMode }).then(event => {
-        this.emit('card-inserted', event)
-        console.info('Card inserted')
+        this.emit('card-connected', event)
+        console.info('Card connected')
       }).catch(this.emit.bind(this, 'error'))
     }
 
