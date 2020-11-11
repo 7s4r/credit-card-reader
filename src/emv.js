@@ -2,7 +2,7 @@ import pcsc from 'pcsclite'
 import tlv from 'node-tlv'
 import Card from './Card.js'
 import hexUtil from './utils/hexUtil.js'
-import { aidList } from './codes.js'
+import { aidList, statusCodes } from './codes.js'
 
 const pcscApp = pcsc()
 
@@ -62,37 +62,45 @@ pcscApp.on('reader', function(reader) {
               const response = await card.selectFile(aidList[i].value)
 
               if (response.isOk()) {
-                console.info('Response ok:', response.getDataOnly())
+                console.info('SELECT response:', response.toString())
                 const tags = tlv.parse(response.getDataOnly())
                 const pdol = tags.find('9F38')
+                const gpoTag = pdol && pdol.value ? pdol.value.substring(0, 4) : 0
+                const gpoTagLength = pdol && pdol.value ? pdol.value.substring(5) : 0
 
-                if (pdol && pdol.value) {
-                  const gpoTag = pdol.value.substring(0, 4)
-                  const gpoTagLength = pdol.value.substring(5)
+                // Execute GPO (Get Processing Options)
+                card.getProcessingOptions(gpoTag, gpoTagLength).then((response) => {
+                  console.info('GPO response:', response.toString())
+                  // Find the AFL tag (Application File Locator) with SFI & record number
+                  const tags = tlv.parse(response.getDataOnly())
+                  const afl = tags.find('94')
+                  const sfi = afl.value.substring(0, 2) || 1
+                  const recordStart = afl.value.substring(2, 4) || 1
+                  const recordEnd = afl.value.substring(4, 6) || 1
+                  const dar = afl.value.substring(6) || null
 
-                  // Execute GPO (Get Processing Options)
-                  card.getProcessingOptions(gpoTag, hexUtil.toHex(gpoTagLength)).then((response) => {
-                    console.info('GPO response:', response)
-                    // Find the AFL tag (Application File Locator)
-                    const tags = tlv.parse(response)
-                    const afl = tags.find('94')
+                  console.info('AFL:', sfi, recordStart, recordEnd, dar)
 
-                    // Get card data
-                    // reader.transmit(Buffer.from([0x00, 0xB2, 0x00, 0x00, 0x01, 0x04, 0x00, 0x00]))
-                    card.readRecord(afl.value, 0x01).then((response) => {
-                      console.info('READ RECORD response:', response)
-                    })
+                  // Get card data
+                  // reader.transmit(Buffer.from([0x00, 0xB2, 0x00, 0x00, 0x01, 0x04, 0x00, 0x00]))
+                  card.readRecord(1, 1).then((response) => {
+                    if (response.isOk()) {
+                      const tags = tlv.parse(response.getDataOnly())
+                      const cardInfos = tags.find('9F6B')
+                      const cardNumber = cardInfos.value.substring(0, 16)
+                      const cardExpiryDate = cardInfos.value.substring(17, 21)
+
+                      console.info('card number:', cardNumber)
+                      console.info('card expiry date (YYMM):', cardExpiryDate)
+                    } else {
+                      console.info('READ RECORD ERROR:', response.meaning())
+                    }
                   })
-                } else {
-                  console.error('PDOL not found')
-                  card.readRecord(1, 0x01).then((response) => {
-                    console.info('READ RECORD response:', response)
-                  })
-                }
+                })
                 
                 break
               } else {
-                console.info('Response not ok:', response.meaning())
+                console.info('SELECT ERROR:', response.meaning())
               }
             }
 

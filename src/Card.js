@@ -37,7 +37,7 @@ class Card extends EventEmitter
       const protocol = this.protocol
 
       this.emit('command-emitted', {card: this, command: apduCommand})
-      console.info('Command emitted')
+      console.info('Command emitted', buffer)
 
       if (callback) {
         this.device.transmit(buffer, 0x102, protocol, (err, response) => {
@@ -119,7 +119,6 @@ class Card extends EventEmitter
         p1: 0x00,
         p2: 0x00,
         data: hexUtil.toByteArray(`83${length}${value}`),
-        le: 0,
       }))
     }
 
@@ -139,7 +138,6 @@ class Card extends EventEmitter
         ins: instructions.READ_RECORD,
         p1: record,
         p2: (sfi << 3) + 4,
-        le: 0,
       }))
     }
 
@@ -149,7 +147,6 @@ class Card extends EventEmitter
         ins: instructions.GET_DATA,
         p1: p1,
         p2: p2,
-        le: 0,
       }))
     }
 }
