@@ -2,33 +2,12 @@ import { EventEmitter } from 'events'
 import ApduResponse from './ApduResponse.js'
 import ApduCommand from './ApduCommand.js'
 import hexUtil from './utils/hexUtil.js'
-
-const ins = {
-  APPEND_RECORD: 0xE2,
-  ENVELOPE: 0xC2,
-  ERASE_BINARY: 0x0E,
-  EXTERNAL_AUTHENTICATE: 0x82,
-  GET_CHALLENGE: 0x84,
-  GET_DATA: 0xCA,
-  GET_RESPONSE: 0xC0,
-  INTERNAL_AUTHENTICATE: 0x88,
-  MANAGE_CHANNEL: 0x70,
-  PUT_DATA: 0xDA,
-  READ_BINARY: 0xB0,
-  READ_RECORD: 0xB2,
-  SELECT_FILE: 0xA4,
-  UPDATE_BINARY: 0xD6,
-  UPDATE_RECORD: 0xDC,
-  VERIFY: 0x20,
-  WRITE_BINARY: 0xD0,
-  WRITE_RECORD: 0xD2,
-}
+import { instructions } from './codes.js'
 
 class Card extends EventEmitter
 {
     constructor(device, atr, protocol) {
       super()
-      //console.log(`new Card(${device}, ${reader}, ${status})`)
       this.device = device
       this.protocol = protocol
       this.atr = atr.toString('hex')
@@ -81,7 +60,6 @@ class Card extends EventEmitter
                 command: apduCommand,
                 response: new ApduResponse(response),
               })
-              console.info('Response received: ', new ApduResponse(response))
               resolve(response)
             }
           })
@@ -116,28 +94,39 @@ class Card extends EventEmitter
     selectFile(bytes, p1, p2) {
       const apduCommand = new ApduCommand({
         cla: 0x00,
-        ins: ins.SELECT_FILE,
+        ins: instructions.SELECT_FILE,
         p1: p1 || 0x04,
         p2: p2 || 0x00,
-        data: bytes,
+        data: hexUtil.toByteArray(bytes),
       })
 
       return this.parseCardResponse(apduCommand).then(response => {
         if (response.isOk()) {
-          const application = Buffer.from(bytes).toString('hex')
+          const application = bytes
           
           this.emit('application-selected', { application })
-          console.info('Application selected: ', application)
+          console.info('Application selected:', application)
         }
 
         return response
       })
     }
 
+    getProcessingOptions(value, length) {
+      return this.parseCardResponse(new ApduCommand({
+        cla: 0x80,
+        ins: instructions.GET_PROCESSING_OPTIONS,
+        p1: 0x00,
+        p2: 0x00,
+        data: hexUtil.toByteArray(`83${length}${value}`),
+        le: 0,
+      }))
+    }
+
     getResponse(length) {
       return this.parseCardResponse(new ApduCommand({
         cla: 0x00,
-        ins: ins.GET_RESPONSE,
+        ins: instructions.GET_RESPONSE,
         p1: 0x00,
         p2: 0x00,
         le: length,
@@ -147,7 +136,7 @@ class Card extends EventEmitter
     readRecord(sfi, record) {
       return this.parseCardResponse(new ApduCommand({
         cla: 0x00,
-        ins: ins.READ_RECORD,
+        ins: instructions.READ_RECORD,
         p1: record,
         p2: (sfi << 3) + 4,
         le: 0,
@@ -157,7 +146,7 @@ class Card extends EventEmitter
     getData(p1, p2) {
       return this.parseCardResponse(new ApduCommand({
         cla: 0x00,
-        ins: ins.GET_DATA,
+        ins: instructions.GET_DATA,
         p1: p1,
         p2: p2,
         le: 0,

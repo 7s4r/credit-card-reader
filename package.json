@@ -30,6 +30,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "node-tlv": "^1.5.14",
     "pcsclite": "^1.0.0"
   },
   "devDependencies": {

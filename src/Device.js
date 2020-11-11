@@ -15,7 +15,7 @@ class Device extends EventEmitter
         this.reader = reader
         this.name = reader.name
         this.shareMode = options.shareMode || reader.SCARD_SHARE_SHARED
-        this.disposition = options.disposition || reader.SCARD_LEAVEcard
+        this.disposition = options.disposition || reader.SCARD_LEAVE
         const autoConnect = options.autoConnect || true
         const autoDisconnect = options.autoDisconnect || true
         const isCardInserted = options.isCardInserted || this.defaultIsCardInserted
@@ -64,7 +64,7 @@ class Device extends EventEmitter
     cardInserted() {
       this.connect({ share_mode: this.shareMode }).then((event) => {
         this.emit('card-connected', event)
-        console.info('Card connected: ', event)
+        console.info('Card connected')
       }).catch(this.emit.bind(this, 'error'))
     }
 

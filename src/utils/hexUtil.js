@@ -18,6 +18,24 @@ const hexUtil = {
 
     return str
   },
+  toHex: function(str) {
+    let hex = ''
+
+    for (let i=0; i<str.length; i++) {
+      hex += str.charCodeAt(i).toString(16)
+    }
+
+    return hex
+  },
+  stringToUTF8Bytes: function(string) {
+    return new TextEncoder().encode(string)
+  },
+  bytesToHex: function(bytes) {
+    return Array.from(
+      bytes,
+      byte => byte.toString(16).padStart(2, "0"),
+    ).join("")
+  },
 }
 
 export default hexUtil
