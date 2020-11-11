@@ -20,8 +20,8 @@ To get started, first install all the necessary dependencies.
 npm install
 ```
 
-## Launch the script
+## Get infos from a credit card
 
 ```
-node --experimental-modules src/index.js
+node src/emv.js
 ```
