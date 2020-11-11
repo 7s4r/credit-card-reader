@@ -78,6 +78,7 @@ pcscApp.on('reader', function(reader) {
                     const afl = tags.find('94')
 
                     // Get card data
+                    // reader.transmit(Buffer.from([0x00, 0xB2, 0x00, 0x00, 0x01, 0x04, 0x00, 0x00]))
                     card.readRecord(afl.value, 0x01).then((response) => {
                       console.info('READ RECORD response:', response)
                     })
