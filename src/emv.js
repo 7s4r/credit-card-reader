@@ -2,7 +2,6 @@ import pcsc from 'pcsclite'
 import tlv from 'node-tlv'
 import Card from './Card.js'
 import hexUtil from './utils/hexUtil.js'
-import tlvUtil from './utils/tlvUtil.js'
 import { aidList } from './codes.js'
 
 const pcscApp = pcsc()
@@ -42,13 +41,16 @@ pcscApp.on('reader', function(reader) {
 
             // First method: select the PSE (1PAY.SYS.DDF01) or PPSE (2PAY.SYS.DDF01) if contactless
             // card.selectFile(hexUtil.toHex('1PAY.SYS.DDF01')).then((response) => {
-            //   console.info('Response for PSE: ', response.getDataOnly())
+            //   console.info('PSE response:', response.getDataOnly())
             //   const tags = tlv.parse(response.getDataOnly())
             //   const sfiTag = tags.find('88')
     
             //   if (sfiTag && sfiTag.value) {
-            //     card.readRecord(sfiTag, sfiTag).then((response) => {
-            //       console.info('Response for READ RECORD: ', response)
+            //     card.readRecord(sfiTag.value, 0x01).then((response) => {
+            //       console.info(
+            //         'READ RECORD response:',
+            //         response.isOk() ? response.getDataOnly() : response.getStatusCode(),
+            //       )
             //     })
             //   } else {
             //     console.error('ERROR: SFI tag not found')    
@@ -68,22 +70,23 @@ pcscApp.on('reader', function(reader) {
                   const gpoTag = pdol.value.substring(0, 4)
                   const gpoTagLength = pdol.value.substring(5)
 
-                  console.info('GPO required tag:', gpoTag, gpoTagLength)
-
                   // Execute GPO (Get Processing Options)
                   card.getProcessingOptions(gpoTag, hexUtil.toHex(gpoTagLength)).then((response) => {
                     console.info('GPO response:', response)
-                    // 5. find the AFL tag (Application File Locator)
+                    // Find the AFL tag (Application File Locator)
                     const tags = tlv.parse(response)
                     const afl = tags.find('94')
 
-                    // 6. READ RECORD (PAN (5A), Expiration date YYMMDD (5F24))
-                    card.readRecord(1, 0x01).then((response) => {
-                      console.info('Response for READ RECORD:', response)
+                    // Get card data
+                    card.readRecord(afl.value, 0x01).then((response) => {
+                      console.info('READ RECORD response:', response)
                     })
                   })
                 } else {
                   console.error('PDOL not found')
+                  card.readRecord(1, 0x01).then((response) => {
+                    console.info('READ RECORD response:', response)
+                  })
                 }
                 
                 break
