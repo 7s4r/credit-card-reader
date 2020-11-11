@@ -30,6 +30,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "asn1-ber": "^1.1.0",
+    "node-tlv": "^1.5.14",
     "pcsclite": "^1.0.0"
   },
   "devDependencies": {
