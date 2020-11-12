@@ -132,12 +132,12 @@ class Card extends EventEmitter
       }))
     }
 
-    readRecord(sfi, record) {
+    readRecord(record, sfi) {
       return this.parseCardResponse(new ApduCommand({
         cla: 0x00,
         ins: instructions.READ_RECORD,
         p1: record,
-        p2: (sfi << 3) + 4,
+        p2: sfi,
       }))
     }
 
