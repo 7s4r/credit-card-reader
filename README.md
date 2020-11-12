@@ -20,8 +20,14 @@ To get started, first install all the necessary dependencies.
 npm install
 ```
 
-## Get infos from a credit card
+## Get data from card by chip
 
 ```
-node src/emv.js
+node src/chip.js
+```
+
+## Get data from card by NFC
+
+```
+node src/nfc.js
 ```
