@@ -1,4 +1,4 @@
-# smartcard
+# credit-card-reader
 Easy reading and writing on smartcards over PC/SC with Node.js
 
 
@@ -30,4 +30,9 @@ node src/chip.js
 
 ```
 node src/nfc.js
+```
+
+## HackRF (WIP)
+```
+node src/hackrf.js
 ```
