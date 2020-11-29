@@ -1,25 +1,28 @@
 {
-  "name": "smartcard",
+  "name": "credit-card-reader",
   "version": "0.0.1",
-  "description": "Easy reading and writing on smartcards over PC/SC with Node.js",
+  "description": "Easy reading on credit cards over PC/SC or NFC with Node.js",
   "author": "Gueorgui AGAPOV",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/7s4r/smartcard.git"
+    "url": "git+https://github.com/7s4r/credit-card-reader.git"
   },
   "bugs": {
-    "url": "https://github.com/7s4r/smartcard/issues"
+    "url": "https://github.com/7s4r/credit-card-reader/issues"
   },
-  "homepage": "https://github.com/7s4r/smartcard#readme",
+  "homepage": "https://github.com/7s4r/credit-card-reader#readme",
   "keywords": [
     "smartcard",
-    "PC/SC",
+    "creditcard",
     "pcsc",
-    "EMV",
-    "APDU",
-    "AID",
-    "ATR"
+    "emv",
+    "apdu",
+    "aid",
+    "atr",
+    "nfc",
+    "chip",
+    "iso7816"
   ],
   "type": "module",
   "engines": {
@@ -30,6 +33,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "hackrf.js": "^1.0.0-rc1",
     "nfc-pcsc": "^0.8.0",
     "node-tlv": "^1.5.14",
     "pcsclite": "^1.0.0"
