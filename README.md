@@ -1,5 +1,5 @@
 # credit-card-reader
-Easy reading and writing on smartcards over PC/SC with Node.js
+Easy reading on credit cards over PC/SC or NFC with Node.js
 
 
 ## Requirements
