@@ -1,6 +1,6 @@
 {
   "name": "credit-card-reader",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easy reading on credit cards over PC/SC or NFC with Node.js",
   "author": "Gueorgui AGAPOV",
   "license": "UNLICENSED",
