@@ -1,9 +1,12 @@
 import { EventEmitter } from 'events'
+import fetch from 'node-fetch'
+import dotenv from 'dotenv'
 import ApduResponse from './ApduResponse.js'
 import ApduCommand from './ApduCommand.js'
 import hexUtil from './utils/hexUtil.js'
 import { instructions } from './codes.js'
 
+dotenv.config()
 class Card extends EventEmitter
 {
     constructor(device, atr, protocol) {
@@ -148,6 +151,12 @@ class Card extends EventEmitter
         p1: p1,
         p2: p2,
       }))
+    }
+
+    getIssuer(number) {
+      return fetch(`${process.env.BIN_LIST_API_URL}/${number}`)
+      .then(res => res.json())
+      .then(json => json)
     }
 }
 

@@ -1,8 +1,10 @@
 import pcsc from 'pcsclite'
 import tlv from 'node-tlv'
 import luhn from 'fast-luhn'
+import chalk from 'chalk'
 import Card from './Card.js'
 import hexUtil from './utils/hexUtil.js'
+import { formatExpiry } from './utils/dateUtil.js'
 import { aidList } from './codes.js'
 
 const app = pcsc()
@@ -89,9 +91,21 @@ app.on('reader', function(reader) {
                   const cardNumber = tags.find('5A')
                   const cardExpiryDate = tags.find('5F24')
 
-                  console.info('card number:', cardNumber.value)
-                  console.info('card expiry date (YYMMDD):', cardExpiryDate.value)
-                  console.info('is valid:', luhn(cardNumber.value))
+                  if (cardNumber) {
+                    const cardIssuer = await card.getIssuer(cardNumber.value)
+
+                    if (cardIssuer) {
+                      console.info('card scheme:', chalk.blue.bold(cardIssuer.scheme))
+                      console.info('card type:', chalk.blue.bold(cardIssuer.type))
+                      console.info('card brand:', chalk.blue.bold(cardIssuer.brand))
+                      console.info('card country:', chalk.blue.bold(cardIssuer.country && cardIssuer.country.name))
+                      console.info('card bank name:', chalk.blue.bold(cardIssuer.bank && cardIssuer.bank.name))
+                    }
+
+                    console.info('card number:', chalk.blue.bold(cardNumber.value))
+                    console.info('card expiry date (MM/YY):', chalk.blue.bold(formatExpiry(cardExpiryDate.value)))
+                    console.info('is valid:', chalk.blue.bold(luhn(cardNumber.value)))
+                  }
                 } else {
                   console.info('READ RECORD ERROR:', readRecordResponse.meaning())
                 }
