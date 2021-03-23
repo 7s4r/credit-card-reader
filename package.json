@@ -33,6 +33,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "credit-card-type": "^9.1.0",
+    "fast-luhn": "^2.0.0",
     "hackrf.js": "^1.0.0-rc1",
     "nfc-pcsc": "^0.8.0",
     "node-tlv": "^1.5.14",

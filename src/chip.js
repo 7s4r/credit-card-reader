@@ -1,5 +1,6 @@
 import pcsc from 'pcsclite'
 import tlv from 'node-tlv'
+import luhn from 'fast-luhn'
 import Card from './Card.js'
 import hexUtil from './utils/hexUtil.js'
 import { aidList } from './codes.js'
@@ -90,6 +91,7 @@ app.on('reader', function(reader) {
 
                   console.info('card number:', cardNumber.value)
                   console.info('card expiry date (YYMMDD):', cardExpiryDate.value)
+                  console.info('is valid:', luhn(cardNumber.value))
                 } else {
                   console.info('READ RECORD ERROR:', readRecordResponse.meaning())
                 }
