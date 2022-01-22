@@ -39,7 +39,7 @@
     "fast-luhn": "^2.0.0",
     "hackrf.js": "^1.0.0-rc1",
     "nfc-pcsc": "^0.8.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "node-tlv": "^1.5.14",
     "pcsclite": "^1.0.0"
   },
