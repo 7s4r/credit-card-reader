@@ -18,7 +18,7 @@ On MacOS, PC/SC is already installed.
 
 [Gemalto chip smart card reader](https://amzn.to/3caTTVQ)
 
-[ACS NFC smard card reader](https://amzn.to/3d0Eyq1)
+[ACS NFC smard card reader](https://amzn.to/3v7zycu)
 
 ## Getting Started
 
